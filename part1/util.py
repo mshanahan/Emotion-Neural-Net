@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 
 #split the data and labels
+#NOT USED in this assignment (i think)
 def split_data(data, labels, proportion):
   #code from Canvas: written by Paul Quint, refactored by Brandon Geren
     size = data.shape[0]
@@ -11,6 +12,7 @@ def split_data(data, labels, proportion):
     split_idx = int(proportion * size)
     return data[s[:split_idx]], data[s[split_idx:]], labels[s[:split_idx]], labels[s[split_idx:]]
 #converts the given labels into white-hot vectors
+#NOT USED in this assignment (i think)
 def white_hot(labels):
   label_shape = ( len(labels), 10 ) #n rows, 10 columns
   new_labels = np.zeros(label_shape)

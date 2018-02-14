@@ -42,8 +42,8 @@ def main(argv):
   print(str(valid_labels_1[0*32:(0+1)*32, :]))
   
   #count data
-  valid_count = [valid_data.shape[0][0], valid_data.shape[1][0], valid_data.shape[2][0], valid_data.shape[3][0]]
-  train_count = [train_data.shape[0][0], train_data.shape[1][0], train_data.shape[2][0], train_data.shape[3][0]]
+  valid_count = [valid_data[0].shape[0], valid_data[1].shape[0], valid_data[2].shape[0], valid_data[3].shape[0]]
+  train_count = [train_data[0].shape[0], train_data[1].shape[0], train_data[2].shape[0], train_data[3].shape[0]]
 
   #specify model
   input_placeholder = tf.placeholder(tf.float32, [None,16641], name='input_placeholder')
@@ -99,7 +99,7 @@ def main(argv):
       print('VALID CROSS ENTROPY: ' + str(avg_valid_ce))
       print('VALIDATION CONFUSION MATRIX:')
       print(str(sum(conf_mxs)))
-      classification_rate = util.classification_rate(sum(conf_mxs),10)
+      classification_rate = util.classification_rate(sum(conf_mxs),7)
       print('VALIDATION CLASSIFICATION RATE:' + str(classification_rate))
       
       ce_vals = []
