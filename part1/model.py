@@ -56,7 +56,7 @@ def convolutional_layer(inputs):
     )
 
 #  return tf.reshape(pool_2,[-1])
-return pool_2
+  return pool_2
 
 #architecture: dense -> dense
 #description: a simple architecture to build off of
