@@ -38,8 +38,8 @@ def main(argv):
   train_labels_4 = np.load(FLAGS.data_dir + 'train_y_4.npy')
   train_labels = [train_labels_1, train_labels_2, train_labels_3, train_labels_4]
   
-  print(str(valid_data_1[0*32:(0+1)*32, :]))
-  print(str(valid_labels_1[0*32:(0+1)*32, :]))
+#  print(str(valid_data_1[0*32:(0+1)*32, :]))
+#  print(str(valid_labels_1[0*32:(0+1)*32, :]))
   
   #count data
   valid_count = [valid_data[0].shape[0], valid_data[1].shape[0], valid_data[2].shape[0], valid_data[3].shape[0]]
@@ -55,7 +55,7 @@ def main(argv):
   REG_COEFF = 0.0001
   labels = tf.placeholder(tf.float32, [None, 7], name='labels')
   cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=my_network)
-  confusion_matrix_op = tf.confusion_matrix(tf.argmax(labels, axis=1), tf.argmax(my_network, axis=1), num_classes=10)
+  confusion_matrix_op = tf.confusion_matrix(tf.argmax(labels, axis=1), tf.argmax(my_network, axis=1), num_classes=7)
   regularization_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
   total_loss = cross_entropy + REG_COEFF * sum(regularization_losses)
 
