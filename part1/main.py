@@ -47,8 +47,10 @@ def main(argv):
 
   #specify model
   input_placeholder = tf.placeholder(tf.float32, [None,16641], name='input_placeholder')
-  linear_layer = model.my_model([64,64,64], input_placeholder)
-  my_network = tf.identity(linear_layer,name='output')
+  conv_layer = model.convolutional_layer(input_placeholder)
+  linear_layer = model.linear_layer(conv_layer)
+  output_layer = tf.layers.dense(linear_layer, 7, name = 'output_layer')
+  my_network = tf.identity(output_layer,name='output')
 
   #define classification loss
   #code adapted from Paul Quint's hackathon 3

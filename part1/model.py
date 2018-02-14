@@ -3,15 +3,65 @@ import util
 import tensorflow as tf
 import numpy as np
 
-def my_model(layer_counts, inputs):
-  regularizer = tf.contrib.layers.l2_regularizer(1.0)
+regularizer = tf.contrib.layers.l2_regularizer(1.0)
 
-  #layer_counts: a 4d array of integers
-  #[0]: hidden 1 size, [1]: hidden 2 size
-  divided_inputs = inputs / 255.0
+#architecture: convolutional -> pool2 -> convolutional -> pool2
+#description: a simple architecture to build off of
+def convolutional_layer(inputs):
+  filters = [32, 32]
+  kernel_size = [3, 3]
+  pool_size = [2, 2]
+  padding = 'same'
 
+  with tf.name_scope("convolutional"):
+    conv_1 = tf.layers.conv2d(
+      inputs,
+      filters[0],
+      kernel_size[0],
+      padding = padding,
+      activation = tf.nn.relu,
+      kernel_regularizer = regularizer,
+      bias_regularizer = regularizer,
+      name = 'conv_1'
+    )
+    
+    pool_1 = tf.layers.max_pooling2d(
+      conv_1,
+      pool_size = pool_size[0],
+      strides = 1,
+      padding = padding,
+      name = 'pool_1'
+    )
+    
+    conv_2 = tf.layers.conv2d(
+      pool_1,
+      filters[0],
+      kernel_size[0],
+      padding = padding,
+      activation = tf.nn.relu,
+      kernel_regularizer = regularizer,
+      bias_regularizer = regularizer,
+      name = 'conv_2'
+    )
+    
+    pool_2 = tf.layers.max_pooling2d(
+      conv_2,
+      pool_size = pool_size[0],
+      strides = 1,
+      padding = padding,
+      name = 'pool_2'
+    )
+    
+  return pool_2
+
+#architecture: dense -> dense
+#description: a simple architecture to build off of
+def linear_layer(inputs):
+  layer_counts = [32, 32]
+
+  with tf.name_scope("linear"):
   hidden_1 = tf.layers.dense(
-    divided_inputs,
+    inputs,
     layer_counts[0],
     activation = tf.nn.relu,
     bias_regularizer = regularizer,
@@ -26,21 +76,4 @@ def my_model(layer_counts, inputs):
     kernel_regularizer = regularizer,
     name = 'hidden_2')
     
-  hidden_3 = tf.layers.dense(
-    hidden_2,
-    layer_counts[2],
-    activation = tf.nn.relu,
-    bias_regularizer = regularizer,
-    kernel_regularizer = regularizer,
-    name = 'hidden_3')
-    
-  dropout_1 = tf.nn.dropout(
-    hidden_3,
-    0.90)
-    
-  output_layer = tf.layers.dense(
-    dropout_1,
-    7,
-    name = 'output_layer')
-    
-  return output_layer
+  return hidden_2
