@@ -7,6 +7,7 @@ regularizer = tf.contrib.layers.l2_regularizer(1.0)
 
 #architecture: convolutional -> pool2 -> convolutional -> pool2
 #description: a simple architecture to build off of
+#NOTE: we're using 1d convolutions. maybe some processing of the input can get us to 2d, better results?
 def convolutional_layer(inputs):
   filters = [32, 32]
   kernel_size = [3, 3]
@@ -14,7 +15,7 @@ def convolutional_layer(inputs):
   padding = 'same'
 
   with tf.name_scope("convolutional"):
-    conv_1 = tf.layers.conv2d(
+    conv_1 = tf.layers.conv1d(
       inputs,
       filters[0],
       kernel_size[0],
@@ -25,7 +26,7 @@ def convolutional_layer(inputs):
       name = 'conv_1'
     )
     
-    pool_1 = tf.layers.max_pooling2d(
+    pool_1 = tf.layers.max_pooling1d(
       conv_1,
       pool_size = pool_size[0],
       strides = 1,
@@ -33,7 +34,7 @@ def convolutional_layer(inputs):
       name = 'pool_1'
     )
     
-    conv_2 = tf.layers.conv2d(
+    conv_2 = tf.layers.conv1d(
       pool_1,
       filters[0],
       kernel_size[0],
@@ -44,7 +45,7 @@ def convolutional_layer(inputs):
       name = 'conv_2'
     )
     
-    pool_2 = tf.layers.max_pooling2d(
+    pool_2 = tf.layers.max_pooling1d(
       conv_2,
       pool_size = pool_size[0],
       strides = 1,
