@@ -9,7 +9,7 @@ regularizer = tf.contrib.layers.l2_regularizer(1.0)
 #description: a simple architecture to build off of
 #NOTE: we're using 1d convolutions. maybe some processing of the input can get us to 2d, better results?
 def convolutional_layer(inputs):
-  reshaped_inputs = tf.reshape(inputs, [1, 129, 129, 1])
+  reshaped_inputs = tf.reshape(inputs, [-1, 129, 129, 1])
 
   filters = [32, 32]
   kernel_size = [3, 3]
@@ -20,7 +20,7 @@ def convolutional_layer(inputs):
     conv_1 = tf.layers.conv2d(
       reshaped_inputs,
       filters[0],
-      kernel_size[0],
+      kernel_size,
       padding = padding,
       activation = tf.nn.relu,
       kernel_regularizer = regularizer,
@@ -30,7 +30,7 @@ def convolutional_layer(inputs):
     
     pool_1 = tf.layers.max_pooling2d(
       conv_1,
-      pool_size = pool_size[0],
+      pool_size = pool_size,
       strides = 1,
       padding = padding,
       name = 'pool_1'
@@ -39,7 +39,7 @@ def convolutional_layer(inputs):
     conv_2 = tf.layers.conv2d(
       pool_1,
       filters[0],
-      kernel_size[0],
+      kernel_size,
       padding = padding,
       activation = tf.nn.relu,
       kernel_regularizer = regularizer,
@@ -49,14 +49,15 @@ def convolutional_layer(inputs):
     
     pool_2 = tf.layers.max_pooling2d(
       conv_2,
-      pool_size = pool_size[0],
+      pool_size = pool_size,
       strides = 1,
       padding = padding,
       name = 'pool_2'
     )
+    
+    flatten_conv = tf.reshape(pool_2,[-1,1040])
 
-#  return tf.reshape(pool_2,[-1])
-  return pool_2
+  return flatten_conv
 
 #architecture: dense -> dense
 #description: a simple architecture to build off of
