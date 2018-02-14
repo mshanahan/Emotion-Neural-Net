@@ -20,10 +20,10 @@ def main(argv):
   valid_data_4 = np.load(FLAGS.data_dir + 'test_x_4.npy')
   valid_data = [valid_data_1, valid_data_2, valid_data_3, valid_data_4]
   
-  valid_labels_1 = np.load(FLAGS.labels_dir + 'test_y_1.npy')
-  valid_labels_2 = np.load(FLAGS.labels_dir + 'test_y_2.npy')
-  valid_labels_3 = np.load(FLAGS.labels_dir + 'test_y_3.npy')
-  valid_labels_4 = np.load(FLAGS.labels_dir + 'test_y_4.npy')
+  valid_labels_1 = np.load(FLAGS.data_dir + 'test_y_1.npy')
+  valid_labels_2 = np.load(FLAGS.data_dir + 'test_y_2.npy')
+  valid_labels_3 = np.load(FLAGS.data_dir + 'test_y_3.npy')
+  valid_labels_4 = np.load(FLAGS.data_dir + 'test_y_4.npy')
   valid_labels = [valid_labels_1, valid_labels_2, valid_labels_3, valid_labels_4]
   
   train_data_1 = np.load(FLAGS.data_dir + 'train_x_1.npy')
@@ -32,10 +32,10 @@ def main(argv):
   train_data_4 = np.load(FLAGS.data_dir + 'train_x_4.npy')
   train_data = [train_data_1, train_data_2, train_data_3, train_data_4]
   
-  train_labels_1 = np.load(FLAGS.labels_dir + 'train_y_1.npy')
-  train_labels_2 = np.load(FLAGS.labels_dir + 'train_y_2.npy')
-  train_labels_3 = np.load(FLAGS.labels_dir + 'train_y_3.npy')
-  train_labels_4 = np.load(FLAGS.labels_dir + 'train_y_4.npy')
+  train_labels_1 = np.load(FLAGS.data_dir + 'train_y_1.npy')
+  train_labels_2 = np.load(FLAGS.data_dir + 'train_y_2.npy')
+  train_labels_3 = np.load(FLAGS.data_dir + 'train_y_3.npy')
+  train_labels_4 = np.load(FLAGS.data_dir + 'train_y_4.npy')
   train_labels = [train_labels_1, train_labels_2, train_labels_3, train_labels_4]
   
   print(str(valid_data_1[0*32:(0+1)*32, :]))
