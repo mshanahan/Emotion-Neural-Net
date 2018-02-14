@@ -9,7 +9,7 @@ regularizer = tf.contrib.layers.l2_regularizer(1.0)
 #description: a simple architecture to build off of
 #NOTE: we're using 1d convolutions. maybe some processing of the input can get us to 2d, better results?
 def convolutional_layer(inputs):
-  reshaped_inputs = tf.reshape(inputs, [1, 129, 129, 1])
+  reshaped_inputs = tf.reshape(inputs, [None, 129, 129, 1])
 
   filters = [32, 32]
   kernel_size = [3, 3]
@@ -55,7 +55,7 @@ def convolutional_layer(inputs):
       name = 'pool_2'
     )
 
-  return pool_2
+  return tf.reshape(pool_2,[-1])
 
 #architecture: dense -> dense
 #description: a simple architecture to build off of
