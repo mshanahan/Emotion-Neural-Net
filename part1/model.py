@@ -51,7 +51,7 @@ def convolutional_layer(inputs):
       padding = padding,
       name = 'pool_2'
     )
-    
+
   return pool_2
 
 #architecture: dense -> dense
@@ -60,20 +60,20 @@ def linear_layer(inputs):
   layer_counts = [32, 32]
 
   with tf.name_scope("linear"):
-  hidden_1 = tf.layers.dense(
-    inputs,
-    layer_counts[0],
-    activation = tf.nn.relu,
-    bias_regularizer = regularizer,
-    kernel_regularizer = regularizer,
-    name = 'hidden_1')
+    hidden_1 = tf.layers.dense(
+      inputs,
+      layer_counts[0],
+      activation = tf.nn.relu,
+      bias_regularizer = regularizer,
+      kernel_regularizer = regularizer,
+      name = 'hidden_1')
 
-  hidden_2 = tf.layers.dense(
-    hidden_1,
-    layer_counts[1],
-    activation = tf.nn.relu,
-    bias_regularizer = regularizer,
-    kernel_regularizer = regularizer,
-    name = 'hidden_2')
-    
+    hidden_2 = tf.layers.dense(
+      hidden_1,
+      layer_counts[1],
+      activation = tf.nn.relu,
+      bias_regularizer = regularizer,
+      kernel_regularizer = regularizer,
+      name = 'hidden_2')
+
   return hidden_2
