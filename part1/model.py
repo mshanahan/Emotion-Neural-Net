@@ -44,7 +44,7 @@ def my_model(layer_counts, inputs):
     
   output_layer = tf.layers.dense(
     dropout_1,
-    10,
+    7,
     kernel_initializer = initializer,
     name = 'output_layer')
     
