@@ -116,7 +116,7 @@ def main(argv):
       
       epochs_since_best += 1
       
-      if(best_valid_ce > avg_valid_ce): #tracking best
+      if(best_valid_ce < avg_valid_ce): #tracking best
         best_valid_ce = avg_valid_ce
         best_train_ce = avg_train_ce
         best_epoch = epoch
