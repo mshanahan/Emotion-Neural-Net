@@ -13,6 +13,7 @@ def convolutional_layer(inputs):
   filters = [32, 32]
   kernel_size = [3, 3]
   pool_size = [2, 2]
+  strides = 2
   padding = 'same'
 
   with tf.name_scope("convolutional"):
@@ -29,15 +30,15 @@ def convolutional_layer(inputs):
     
     pool_1 = tf.layers.max_pooling2d(
       conv_1,
-      pool_size = pool_size,
-      strides = 1,
+      pool_size,
+      strides,
       padding = padding,
       name = 'pool_1'
     )
     
     conv_2 = tf.layers.conv2d(
       pool_1,
-      filters[0],
+      filters[1],
       kernel_size,
       padding = padding,
       activation = tf.nn.relu,
@@ -48,8 +49,8 @@ def convolutional_layer(inputs):
     
     pool_2 = tf.layers.max_pooling2d(
       conv_2,
-      pool_size = pool_size,
-      strides = 1,
+      pool_size,
+      strides,
       padding = padding,
       name = 'pool_2'
     )
