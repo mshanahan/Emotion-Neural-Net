@@ -7,7 +7,6 @@ regularizer = tf.contrib.layers.l2_regularizer(1.0)
 
 #architecture: convolutional -> pool2 -> convolutional -> pool2
 #description: a simple architecture to build off of
-#NOTE: we're using 1d convolutions. maybe some processing of the input can get us to 2d, better results?
 def convolutional_layer(inputs):
   reshaped_inputs = tf.reshape(inputs, [-1, 129, 129, 1])
 
@@ -55,7 +54,15 @@ def convolutional_layer(inputs):
       name = 'pool_2'
     )
     
-    flatten_conv = tf.reshape(pool_2,[-1,1040])
+    #this line is sort of confusing
+    #ignore the -1, don't change it
+    #the second value is important
+    #the first two values (33 and 33) are the x and y dimensions of the image AFTER pooling
+    #in this case it is 33, because we have 2 pooling layers
+    #129 / 2 = 65 | 65 / 2 = 33 (ROUND UP)
+    #the 32 comes from the number of filters in our final convolutional layer
+    #just set it to whatever the number of filters in the final convolutional layer is
+    flatten_conv = tf.reshape(pool_2,[-1,33 * 33 * 32])
 
   return flatten_conv
 
