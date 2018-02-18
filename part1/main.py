@@ -7,7 +7,7 @@ import numpy as np
 #code to set flags by Paul Quint
 flags = tf.app.flags
 flags.DEFINE_string('data_dir', '/work/cse496dl/shared/homework/02/EMODB-German/', 'directory where MNIST is located')
-flags.DEFINE_string('save_dir', 'homework_2', 'directory where model graph and weights are saved')
+flags.DEFINE_string('save_dir', '/work/cse496dl/mshanaha/homework_2/emodb_homework_2-0-0', 'directory where model graph and weights are saved')
 flags.DEFINE_integer('batch_size', 32, '')
 flags.DEFINE_integer('max_epoch_num', 100, '')
 FLAGS = flags.FLAGS
@@ -122,7 +122,7 @@ def main(argv):
         best_epoch = epoch
         best_classification_rate = classification_rate
         epochs_since_best = 0
-        saver.save(session, "/work/cse496dl/mshanaha/homework_1/homework_1-0")
+        saver.save(session, FLAGS.save_dir)
         print("BEST FOUND")
         
       if(epochs_since_best >= EPOCHS_BEFORE_STOPPING): #early stopping
