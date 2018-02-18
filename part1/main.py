@@ -69,11 +69,6 @@ def main(argv):
   saver = tf.train.Saver()
   sum_cross_entropy = tf.reduce_mean(cross_entropy)
   
-  best_k = 5
-  best_all_epoch = 
-  best_all_valid_ce = 10
-  best_all_train_ce = 0
-  best_all_classification_rate = 0
   EPOCHS_BEFORE_STOPPING = 12
   
   #run the actual training
