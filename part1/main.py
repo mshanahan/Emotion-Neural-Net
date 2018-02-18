@@ -87,7 +87,7 @@ def main(argv):
       best_classification_rate = 0
       epochs_since_best = 0
       batch_size = FLAGS.batch_size
-      print("\n !!!!! NEW K (" + k + ") !!!!!\n")
+      print("\n !!!!! NEW K (" + str(k) + ") !!!!!\n")
       for epoch in range(FLAGS.max_epoch_num):
         print("################### EPOCH " + str(epoch) + " #####################")
         print("##################################################\n")
