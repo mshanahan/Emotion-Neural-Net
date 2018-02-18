@@ -70,7 +70,7 @@ def main(argv):
   sum_cross_entropy = tf.reduce_mean(cross_entropy)
   
   best_k = 5
-  best_all_epoch = 0
+  best_all_epoch = 
   best_all_valid_ce = 10
   best_all_train_ce = 0
   best_all_classification_rate = 0
@@ -80,12 +80,13 @@ def main(argv):
   #code adapted from Paul Quint's hackathon 3
   with tf.Session() as session:
     session.run(tf.global_variables_initializer())
+    best_epoch = [0, 0, 0, 0]
+    best_valid_ce = [10, 10, 10, 10]
+    best_train_ce = [0, 0, 0, 0]
+    best_classification_rate = [0, 0, 0, 0]
+    epochs_since_best = [0, 0, 0, 0]
+
     for k in range(0,4):
-      best_epoch = 0
-      best_valid_ce = 10
-      best_train_ce = 0
-      best_classification_rate = 0
-      epochs_since_best = 0
       batch_size = FLAGS.batch_size
       print("\n !!!!! NEW K (" + str(k) + ") !!!!!\n")
       for epoch in range(FLAGS.max_epoch_num):
@@ -121,32 +122,26 @@ def main(argv):
         
         epochs_since_best += 1
         
-        if(best_valid_ce > avg_valid_ce): #tracking best
-          best_valid_ce = avg_valid_ce
-          best_train_ce = avg_train_ce
-          best_epoch = epoch
-          best_classification_rate = classification_rate
-          epochs_since_best = 0
-          print("BEST FOUND")
-          
-        if(best_all_valid_ce > best_valid_ce): #tracking best of all time
-          best_all_valid_ce = best_valid_ce
-          best_all_train_ce = best_train_ce
-          best_all_epoch = best_epoch
-          best_all_classification_rate = best_classification_rate
-          best_k = k
+        if(best_valid_ce[k] > avg_valid_ce): #tracking best
+          best_valid_ce[k] = avg_valid_ce
+          best_train_ce[k] = avg_train_ce
+          best_epoch[k] = epoch
+          best_classification_rate[k] = classification_rate
+          epochs_since_best[k] = 0
           saver.save(session, FLAGS.save_dir)
-          print("BEST ALL TIME FOUND")
+          print("BEST FOUND")
 
-        if(epochs_since_best >= EPOCHS_BEFORE_STOPPING): #early stopping
+        if(epochs_since_best[k] >= EPOCHS_BEFORE_STOPPING): #early stopping
           print("EARLY STOP")
           break
           
         print("\n##################################################")
         
-      print('Best Epoch: ' + str(best_epoch))
-    print('Best k: ' + str(best_k))
-    print('Best epoch of k: ' + str(best_all_epoch))
+    print('Best Epoch: ' + str(np.average(best_epoch)))
+    print('Valid CE: ' + str(np.average(best_valid_ce)))
+    print('Train CE: ' + str(np.average(best_train_ce)))
+    print('Classification Rate: ' + str(np.average(best_classification_rate)))
+    
 
 if __name__ == "__main__":
     tf.app.run()
