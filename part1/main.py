@@ -69,69 +69,84 @@ def main(argv):
   saver = tf.train.Saver()
   sum_cross_entropy = tf.reduce_mean(cross_entropy)
   
+  best_k = 5
+  best_all_epoch = 0
+  best_all_valid_ce = 0
+  best_all_train_ce = 0
+  best_all_classification_rate = 0
   EPOCHS_BEFORE_STOPPING = 12
-  best_epoch = 0
-  best_valid_ce = 0
-  best_train_ce = 0
-  best_classification_rate = 0
-  epochs_since_best = 0
   
   #run the actual training
   #code adapted from Paul Quint's hackathon 3
   with tf.Session() as session:
     session.run(tf.global_variables_initializer())
-    batch_size = FLAGS.batch_size
-    for epoch in range(FLAGS.max_epoch_num):
-      print("################### EPOCH " + str(epoch) + " #####################")
-      print("##################################################\n")
-      
-      # run gradient steps and report mean loss on train data
-      # !!!!!!!!!!!!!!!!
-      # TODO: Set this up for 4-fold cross validation (right now it just uses the first set of data)
-      ce_vals = []
-      conf_mxs = []
-      for i in range(valid_count[0] // batch_size):
-        batch_data = valid_data[0][i*batch_size:(i+1)*batch_size, :]
-        batch_labels = valid_labels[0][i*batch_size:(i+1)*batch_size]
-        #batch_labels = util.white_hot(batch_labels)
-        valid_ce, conf_matrix = session.run([sum_cross_entropy, confusion_matrix_op], {input_placeholder: batch_data, labels: batch_labels})
-        ce_vals.append(valid_ce)
-        conf_mxs.append(conf_matrix)
-      avg_valid_ce = sum(ce_vals) / len(ce_vals)
-      print('VALID CROSS ENTROPY: ' + str(avg_valid_ce))
-      print('VALIDATION CONFUSION MATRIX:')
-      print(str(sum(conf_mxs)))
-      classification_rate = util.classification_rate(sum(conf_mxs),7)
-      print('VALIDATION CLASSIFICATION RATE:' + str(classification_rate))
-      
-      ce_vals = []
-      for i in range(train_count[0] // batch_size):
-        batch_data = train_data[0][i*batch_size:(i+1)*batch_size, :]
-        batch_labels = train_labels[0][i*batch_size:(i+1)*batch_size]
-        #batch_labels = util.white_hot(batch_labels)
-        _, train_ce = session.run([train_op, sum_cross_entropy], {input_placeholder: batch_data, labels: batch_labels})
-        ce_vals.append(train_ce)
-      avg_train_ce = sum(ce_vals) / len(ce_vals)
-      print('TRAIN CROSS ENTROPY: ' + str(avg_train_ce))
-      
-      epochs_since_best += 1
-      
-      if(best_valid_ce < avg_valid_ce): #tracking best
-        best_valid_ce = avg_valid_ce
-        best_train_ce = avg_train_ce
-        best_epoch = epoch
-        best_classification_rate = classification_rate
-        epochs_since_best = 0
-        saver.save(session, FLAGS.save_dir)
-        print("BEST FOUND")
+    for k in range(0,4):
+      best_epoch = 0
+      best_valid_ce = 0
+      best_train_ce = 0
+      best_classification_rate = 0
+      epochs_since_best = 0
+      batch_size = FLAGS.batch_size
+      print("\n !!!!! NEW K (" + k + ") !!!!!\n")
+      for epoch in range(FLAGS.max_epoch_num):
+        print("################### EPOCH " + str(epoch) + " #####################")
+        print("##################################################\n")
         
-      if(epochs_since_best >= EPOCHS_BEFORE_STOPPING): #early stopping
-        print("EARLY STOP")
-        break
+        # run gradient steps and report mean loss on train data
+        ce_vals = []
+        conf_mxs = []
+        for i in range(valid_count[k] // batch_size):
+          batch_data = valid_data[k][i*batch_size:(i+1)*batch_size, :]
+          batch_labels = valid_labels[k][i*batch_size:(i+1)*batch_size]
+          #batch_labels = util.white_hot(batch_labels)
+          valid_ce, conf_matrix = session.run([sum_cross_entropy, confusion_matrix_op], {input_placeholder: batch_data, labels: batch_labels})
+          ce_vals.append(valid_ce)
+          conf_mxs.append(conf_matrix)
+        avg_valid_ce = sum(ce_vals) / len(ce_vals)
+        print('VALID CROSS ENTROPY: ' + str(avg_valid_ce))
+        print('VALIDATION CONFUSION MATRIX:')
+        print(str(sum(conf_mxs)))
+        classification_rate = util.classification_rate(sum(conf_mxs),7)
+        print('VALIDATION CLASSIFICATION RATE:' + str(classification_rate))
         
-      print("\n##################################################")
-      
-    print('Best Epoch: ' + str(best_epoch))
+        ce_vals = []
+        for i in range(train_count[k] // batch_size):
+          batch_data = train_data[k][i*batch_size:(i+1)*batch_size, :]
+          batch_labels = train_labels[k][i*batch_size:(i+1)*batch_size]
+          #batch_labels = util.white_hot(batch_labels)
+          _, train_ce = session.run([train_op, sum_cross_entropy], {input_placeholder: batch_data, labels: batch_labels})
+          ce_vals.append(train_ce)
+        avg_train_ce = sum(ce_vals) / len(ce_vals)
+        print('TRAIN CROSS ENTROPY: ' + str(avg_train_ce))
+        
+        epochs_since_best += 1
+        
+        if(best_valid_ce < avg_valid_ce): #tracking best
+          best_valid_ce = avg_valid_ce
+          best_train_ce = avg_train_ce
+          best_epoch = epoch
+          best_classification_rate = classification_rate
+          epochs_since_best = 0
+          print("BEST FOUND")
+          
+        if(best_valid_ce < best_all_valid_ce): #tracking best of all time
+          best_all_valid_ce = best_valid_ce
+          best_all_train_ce = best_train_ce
+          best_all_epoch = best_epoch
+          best_all_classification_rate = best_classification_rate
+          best_k = k
+          saver.save(session, FLAGS.save_dir)
+          print("BEST ALL TIME FOUND")
+
+        if(epochs_since_best >= EPOCHS_BEFORE_STOPPING): #early stopping
+          print("EARLY STOP")
+          break
+          
+        print("\n##################################################")
+        
+      print('Best Epoch: ' + str(best_epoch))
+    print('Best k: ' + str(best_k))
+    print('Best epoch of k: ' + str(best_all_epoch))
 
 if __name__ == "__main__":
     tf.app.run()
