@@ -129,7 +129,7 @@ def main(argv):
           epochs_since_best = 0
           print("BEST FOUND")
           
-        if(best_valid_ce < best_all_valid_ce): #tracking best of all time
+        if(best_all_valid_ce < best_valid_ce): #tracking best of all time
           best_all_valid_ce = best_valid_ce
           best_all_train_ce = best_train_ce
           best_all_epoch = best_epoch
