@@ -71,7 +71,7 @@ def main(argv):
   
   best_k = 5
   best_all_epoch = 0
-  best_all_valid_ce = 0
+  best_all_valid_ce = 10
   best_all_train_ce = 0
   best_all_classification_rate = 0
   EPOCHS_BEFORE_STOPPING = 12
@@ -82,7 +82,7 @@ def main(argv):
     session.run(tf.global_variables_initializer())
     for k in range(0,4):
       best_epoch = 0
-      best_valid_ce = 0
+      best_valid_ce = 10
       best_train_ce = 0
       best_classification_rate = 0
       epochs_since_best = 0
@@ -121,7 +121,7 @@ def main(argv):
         
         epochs_since_best += 1
         
-        if(best_valid_ce < avg_valid_ce): #tracking best
+        if(best_valid_ce > avg_valid_ce): #tracking best
           best_valid_ce = avg_valid_ce
           best_train_ce = avg_train_ce
           best_epoch = epoch
@@ -129,7 +129,7 @@ def main(argv):
           epochs_since_best = 0
           print("BEST FOUND")
           
-        if(best_all_valid_ce < best_valid_ce): #tracking best of all time
+        if(best_all_valid_ce > best_valid_ce): #tracking best of all time
           best_all_valid_ce = best_valid_ce
           best_all_train_ce = best_train_ce
           best_all_epoch = best_epoch
