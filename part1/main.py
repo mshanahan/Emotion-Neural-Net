@@ -115,7 +115,7 @@ def main(argv):
         avg_train_ce = sum(ce_vals) / len(ce_vals)
         print('TRAIN CROSS ENTROPY: ' + str(avg_train_ce))
         
-        epochs_since_best += 1
+        epochs_since_best[k] += 1
         
         if(best_valid_ce[k] > avg_valid_ce): #tracking best
           best_valid_ce[k] = avg_valid_ce
