@@ -82,6 +82,7 @@ def main(argv):
     epochs_since_best = [0, 0, 0, 0]
 
     for k in range(0,4):
+      session.run(tf.global_variables_initializer())
       batch_size = FLAGS.batch_size
       print("\n !!!!! NEW K (" + str(k) + ") !!!!!\n")
       for epoch in range(FLAGS.max_epoch_num):
@@ -104,7 +105,7 @@ def main(argv):
         print(str(sum(conf_mxs)))
         classification_rate = util.classification_rate(sum(conf_mxs),7)
         print('VALIDATION CLASSIFICATION RATE:' + str(classification_rate))
-        
+
         ce_vals = []
         for i in range(train_count[k] // batch_size):
           batch_data = train_data[k][i*batch_size:(i+1)*batch_size, :]
@@ -114,29 +115,41 @@ def main(argv):
           ce_vals.append(train_ce)
         avg_train_ce = sum(ce_vals) / len(ce_vals)
         print('TRAIN CROSS ENTROPY: ' + str(avg_train_ce))
-        
+
         epochs_since_best[k] += 1
-        
+
         if(best_valid_ce[k] > avg_valid_ce): #tracking best
           best_valid_ce[k] = avg_valid_ce
           best_train_ce[k] = avg_train_ce
           best_epoch[k] = epoch
           best_classification_rate[k] = classification_rate
           epochs_since_best[k] = 0
-          saver.save(session, FLAGS.save_dir)
           print("BEST FOUND")
 
         if(epochs_since_best[k] >= EPOCHS_BEFORE_STOPPING): #early stopping
           print("EARLY STOP")
           break
-          
+
         print("\n##################################################")
-        
+
     print('Best Epoch: ' + str(np.average(best_epoch)))
     print('Valid CE: ' + str(np.average(best_valid_ce)))
     print('Train CE: ' + str(np.average(best_train_ce)))
     print('Classification Rate: ' + str(np.average(best_classification_rate)))
+    print('Generating model now...')
+    session.run(tf.global_variables_initializer())
+    epochs_to_train_for = math.ceil(np.average(best_classification_rate))
     
+    for j in range(0,4):
+      for epoch in range(epochs_to_train_for):
+        for i in range(train_count[j] // batch_size):
+          batch_data = train_data[j][i*batch_size:(i+1)*batch_size, :]
+          batch_labels = train_labels[j][i*batch_size:(i+1)*batch_size]
+          _, train_ce = session.run([train_op, sum_cross_entropy], {input_placeholder: batch_data, labels: batch_labels})
+          ce_vals.append(train_ce)
+        avg_train_ce = sum(ce_vals) / len(ce_vals)
+        
+    saver.save(session, FLAGS.save_dir)
 
 if __name__ == "__main__":
     tf.app.run()
