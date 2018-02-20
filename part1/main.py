@@ -38,9 +38,6 @@ def main(argv):
   train_labels_4 = np.load(FLAGS.data_dir + 'train_y_4.npy')
   train_labels = [train_labels_1, train_labels_2, train_labels_3, train_labels_4]
   
-#  print(str(valid_data_1[0*32:(0+1)*32, :]))
-#  print(str(valid_labels_1[0*32:(0+1)*32, :]))
-  
   #count data
   valid_count = [valid_data[0].shape[0], valid_data[1].shape[0], valid_data[2].shape[0], valid_data[3].shape[0]]
   train_count = [train_data[0].shape[0], train_data[1].shape[0], train_data[2].shape[0], train_data[3].shape[0]]
@@ -95,7 +92,6 @@ def main(argv):
         for i in range(valid_count[k] // batch_size):
           batch_data = valid_data[k][i*batch_size:(i+1)*batch_size, :]
           batch_labels = valid_labels[k][i*batch_size:(i+1)*batch_size]
-          #batch_labels = util.white_hot(batch_labels)
           valid_ce, conf_matrix = session.run([sum_cross_entropy, confusion_matrix_op], {input_placeholder: batch_data, labels: batch_labels})
           ce_vals.append(valid_ce)
           conf_mxs.append(conf_matrix)
@@ -110,7 +106,6 @@ def main(argv):
         for i in range(train_count[k] // batch_size):
           batch_data = train_data[k][i*batch_size:(i+1)*batch_size, :]
           batch_labels = train_labels[k][i*batch_size:(i+1)*batch_size]
-          #batch_labels = util.white_hot(batch_labels)
           _, train_ce = session.run([train_op, sum_cross_entropy], {input_placeholder: batch_data, labels: batch_labels})
           ce_vals.append(train_ce)
         avg_train_ce = sum(ce_vals) / len(ce_vals)
@@ -132,24 +127,23 @@ def main(argv):
 
         print("\n##################################################")
 
-    print('Best Epoch: ' + str(np.average(best_epoch)))
-    print('Valid CE: ' + str(np.average(best_valid_ce)))
-    print('Train CE: ' + str(np.average(best_train_ce)))
-    print('Classification Rate: ' + str(np.average(best_classification_rate)))
+    print('Avg Best Epoch: ' + str(np.average(best_epoch)))
+    print('Avg Valid CE: ' + str(np.average(best_valid_ce)))
+    print('Avg Train CE: ' + str(np.average(best_train_ce)))
+    print('Avg Classification Rate: ' + str(np.average(best_classification_rate)))
     print('Generating model now...')
     session.run(tf.global_variables_initializer())
-    epochs_to_train_for = math.ceil(np.average(best_classification_rate))
-    
+    epochs_to_train_for = math.ceil(np.average(best_epoch))
+
     for j in range(0,4):
       for epoch in range(epochs_to_train_for):
         for i in range(train_count[j] // batch_size):
           batch_data = train_data[j][i*batch_size:(i+1)*batch_size, :]
           batch_labels = train_labels[j][i*batch_size:(i+1)*batch_size]
           _, train_ce = session.run([train_op, sum_cross_entropy], {input_placeholder: batch_data, labels: batch_labels})
-          ce_vals.append(train_ce)
-        avg_train_ce = sum(ce_vals) / len(ce_vals)
-        
+
     saver.save(session, FLAGS.save_dir)
+    print('Model is generated and saved')
 
 if __name__ == "__main__":
     tf.app.run()
