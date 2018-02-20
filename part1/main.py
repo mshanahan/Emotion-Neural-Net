@@ -3,6 +3,7 @@ import model
 import util
 import tensorflow as tf
 import numpy as np
+import math
 
 #code to set flags by Paul Quint
 flags = tf.app.flags
