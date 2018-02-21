@@ -6,9 +6,9 @@ import numpy as np
 regularizer = tf.contrib.layers.l2_regularizer(1.0)
 
 def build_network(input_placeholder):
-  conv_layer = convolutional_layer(input_placeholder)
-  linear_layer = linear_layer(conv_layer)
-  output_layer = tf.layers.dense(linear_layer, 7, name = 'output_layer')
+  my_conv_layer = convolutional_layer(input_placeholder)
+  my_linear_layer = linear_layer(conv_layer)
+  output_layer = tf.layers.dense(my_linear_layer, 7, name = 'output_layer')
   return output_layer
 
 #architecture: convolutional -> pool2 -> convolutional -> pool2
