@@ -70,6 +70,8 @@ def main(argv):
   #code adapted from Paul Quint's hackathon 3
   with tf.Session() as session:
     session.run(tf.global_variables_initializer())
+    best_valid_conf_mxs = []
+    current_best_valid_conf_mx = []
     best_epoch = [0, 0, 0, 0]
     best_valid_ce = [10, 10, 10, 10]
     best_train_ce = [0, 0, 0, 0]
@@ -112,6 +114,7 @@ def main(argv):
         epochs_since_best[k] += 1
 
         if(best_valid_ce[k] > avg_valid_ce): #tracking best
+          current_best_valid_conf_mx = conf_matrix
           best_valid_ce[k] = avg_valid_ce
           best_train_ce[k] = avg_train_ce
           best_epoch[k] = epoch
@@ -121,10 +124,12 @@ def main(argv):
 
         if(epochs_since_best[k] >= EPOCHS_BEFORE_STOPPING): #early stopping
           print("EARLY STOP")
+          best_valid_conf_mxs.append(current_best_valid_conf_mx)
           break
 
         print("\n##################################################")
 
+    print('Confusion Matrix: ' + str(sum(best_valid_conf_mxs)))
     print('Avg Best Epoch: ' + str(np.average(best_epoch)))
     print('Avg Valid CE: ' + str(np.average(best_valid_ce)))
     print('Avg Train CE: ' + str(np.average(best_train_ce)))
