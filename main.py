@@ -122,7 +122,7 @@ def main(argv):
 
         if(epochs_since_best[k] >= EPOCHS_BEFORE_STOPPING): #early stopping
           print("EARLY STOP")
-          best_valid_conf_mxs.append(conf_mxs)
+          best_valid_conf_mxs.append(sum(conf_mxs))
           break
 
         print("\n##################################################")
