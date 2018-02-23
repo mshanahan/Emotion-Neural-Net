@@ -85,21 +85,6 @@ def main(argv):
         print("################### EPOCH " + str(epoch) + " #####################")
         print("##################################################\n")
         
-        # run gradient steps and report mean loss on train data
-        ce_vals = []
-        conf_mxs = []
-        for i in range(test_count[k] // batch_size):
-          batch_data = test_data[k][i*batch_size:(i+1)*batch_size, :]
-          batch_labels = test_labels[k][i*batch_size:(i+1)*batch_size]
-          test_ce, conf_matrix = session.run([sum_cross_entropy, confusion_matrix_op], {input_placeholder: batch_data, labels: batch_labels})
-          ce_vals.append(test_ce)
-          conf_mxs.append(conf_matrix)
-        avg_test_ce = sum(ce_vals) / len(ce_vals)
-        print('test CROSS ENTROPY: ' + str(avg_test_ce))
-        print('testATION CONFUSION MATRIX:')
-        print(str(sum(conf_mxs)))
-        classification_rate = util.classification_rate(sum(conf_mxs),7)
-        print('testATION CLASSIFICATION RATE:' + str(classification_rate))
 
         ce_vals = []
         for i in range(train_count[k] // batch_size):
@@ -126,6 +111,22 @@ def main(argv):
           break
 
         print("\n##################################################")
+        
+      # run gradient steps and report mean loss on train data
+      ce_vals = []
+      conf_mxs = []
+      for i in range(test_count[k] // batch_size):
+        batch_data = test_data[k][i*batch_size:(i+1)*batch_size, :]
+        batch_labels = test_labels[k][i*batch_size:(i+1)*batch_size]
+        test_ce, conf_matrix = session.run([sum_cross_entropy, confusion_matrix_op], {input_placeholder: batch_data, labels: batch_labels})
+        ce_vals.append(test_ce)
+        conf_mxs.append(conf_matrix)
+      avg_test_ce = sum(ce_vals) / len(ce_vals)
+      print('TEST CROSS ENTROPY: ' + str(avg_test_ce))
+      print('TEST CONFUSION MATRIX:')
+      print(str(sum(conf_mxs)))
+      classification_rate = util.classification_rate(sum(conf_mxs),7)
+      print('TEST CLASSIFICATION RATE:' + str(classification_rate))
 
     print('Confusion Matrix: ')
     print(str(sum(best_test_conf_mxs)))
