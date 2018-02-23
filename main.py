@@ -10,7 +10,7 @@ flags = tf.app.flags
 flags.DEFINE_string('data_dir', '/work/cse496dl/shared/homework/02/EMODB-German/', 'directory where MNIST is located')
 flags.DEFINE_string('save_dir', '/work/cse496dl/mshanaha/homework_2/emodb_homework_2-0-0', 'directory where model graph and weights are saved')
 flags.DEFINE_integer('batch_size', 32, '')
-flags.DEFINE_integer('max_epoch_num', 100, '')
+flags.DEFINE_integer('max_epoch_num', 25, '')
 FLAGS = flags.FLAGS
 
 def main(argv):
@@ -93,22 +93,23 @@ def main(argv):
           _, train_ce = session.run([train_op, sum_cross_entropy], {input_placeholder: batch_data, labels: batch_labels})
           ce_vals.append(train_ce)
         avg_train_ce = sum(ce_vals) / len(ce_vals)
+        best_train_ce[k] = avg_train_ce
         print('TRAIN CROSS ENTROPY: ' + str(avg_train_ce))
 
-        epochs_since_best[k] += 1
-
-        if(best_test_ce[k] > avg_test_ce): #tracking best
-          best_test_ce[k] = avg_test_ce
-          best_train_ce[k] = avg_train_ce
-          best_epoch[k] = epoch
-          best_classification_rate[k] = classification_rate
-          epochs_since_best[k] = 0
-          print("BEST FOUND")
-
-        if(epochs_since_best[k] >= EPOCHS_BEFORE_STOPPING): #early stopping
-          print("EARLY STOP")
-          best_test_conf_mxs.append(sum(conf_mxs))
-          break
+#        epochs_since_best[k] += 1
+#
+#        if(best_test_ce[k] > avg_test_ce): #tracking best
+#          best_test_ce[k] = avg_test_ce
+#          best_train_ce[k] = avg_train_ce
+#          best_epoch[k] = epoch
+#          best_classification_rate[k] = classification_rate
+#          epochs_since_best[k] = 0
+#          print("BEST FOUND")
+#
+#        if(epochs_since_best[k] >= EPOCHS_BEFORE_STOPPING): #early stopping
+#          print("EARLY STOP")
+#          best_test_conf_mxs.append(sum(conf_mxs))
+#          break
 
         print("\n##################################################")
         
@@ -122,28 +123,31 @@ def main(argv):
         ce_vals.append(test_ce)
         conf_mxs.append(conf_matrix)
       avg_test_ce = sum(ce_vals) / len(ce_vals)
+      classification_rate = util.classification_rate(sum(conf_mxs),7)
       print('TEST CROSS ENTROPY: ' + str(avg_test_ce))
       print('TEST CONFUSION MATRIX:')
       print(str(sum(conf_mxs)))
-      classification_rate = util.classification_rate(sum(conf_mxs),7)
       print('TEST CLASSIFICATION RATE:' + str(classification_rate))
+      best_test_conf_mxs.append(sum(conf_mxs))
+      best_test_ce[k] = avg_test_ce
+      best_classification_rate[k] = classification_rate
+      
 
     print('Confusion Matrix: ')
     print(str(sum(best_test_conf_mxs)))
-    print('Avg Best Epoch: ' + str(np.average(best_epoch)))
-    print('Avg test CE: ' + str(np.average(best_test_ce)))
+    print('Avg Test CE: ' + str(np.average(best_test_ce)))
     print('Avg Train CE: ' + str(np.average(best_train_ce)))
     print('Avg Classification Rate: ' + str(np.average(best_classification_rate)))
     print('Generating model now...')
     session.run(tf.global_variables_initializer())
-    epochs_to_train_for = math.ceil(np.average(best_epoch))
+#    epochs_to_train_for = math.ceil(np.average(best_epoch))
 
-    for j in range(0,4):
-      for epoch in range(epochs_to_train_for):
-        for i in range(train_count[j] // batch_size):
-          batch_data = train_data[j][i*batch_size:(i+1)*batch_size, :]
-          batch_labels = train_labels[j][i*batch_size:(i+1)*batch_size]
-          _, train_ce = session.run([train_op, sum_cross_entropy], {input_placeholder: batch_data, labels: batch_labels})
+#    for j in range(0,4):
+#      for epoch in range(epochs_to_train_for):
+#        for i in range(train_count[j] // batch_size):
+#          batch_data = train_data[j][i*batch_size:(i+1)*batch_size, :]
+#          batch_labels = train_labels[j][i*batch_size:(i+1)*batch_size]
+#          _, train_ce = session.run([train_op, sum_cross_entropy], {input_placeholder: batch_data, labels: batch_labels})
 
     saver.save(session, FLAGS.save_dir)
     print('Model is generated and saved')
