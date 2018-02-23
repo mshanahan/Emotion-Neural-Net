@@ -12,7 +12,7 @@ def build_network(input_placeholder):
   return output_layer
 
 #architecture: convolutional -> pool2 -> convolutional -> pool2
-#description: a simple architecture to build off of
+#description: a simple two-layer architecture utilizing l2 regularization
 def convolutional_layer(inputs):
   reshaped_inputs = tf.reshape(inputs, [-1, 129, 129, 1])
 
@@ -60,21 +60,12 @@ def convolutional_layer(inputs):
       padding = padding,
       name = 'pool_2'
     )
-    
-    #this line is sort of confusing
-    #ignore the -1, don't change it
-    #the second value is important
-    #the first two values (33 and 33) are the x and y dimensions of the image AFTER pooling
-    #in this case it is 33, because we have 2 pooling layers
-    #129 / 2 = 65 | 65 / 2 = 33 (ROUND UP)
-    #the 32 comes from the number of filters in our final convolutional layer
-    #just set it to whatever the number of filters in the final convolutional layer is
     flatten_conv = tf.reshape(pool_2,[-1,33 * 33 * 32])
 
   return flatten_conv
 
 #architecture: dense -> dense
-#description: a simple architecture to build off of
+#description: a simple linear architecture utilizing l2 regularization
 def linear_layer(inputs):
   layer_counts = [32, 32]
 
