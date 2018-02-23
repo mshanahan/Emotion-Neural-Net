@@ -15,17 +15,17 @@ FLAGS = flags.FLAGS
 
 def main(argv):
   #load data
-  valid_data_1 = np.load(FLAGS.data_dir + 'test_x_1.npy')
-  valid_data_2 = np.load(FLAGS.data_dir + 'test_x_2.npy')
-  valid_data_3 = np.load(FLAGS.data_dir + 'test_x_3.npy')
-  valid_data_4 = np.load(FLAGS.data_dir + 'test_x_4.npy')
-  valid_data = [valid_data_1, valid_data_2, valid_data_3, valid_data_4]
+  test_data_1 = np.load(FLAGS.data_dir + 'test_x_1.npy')
+  test_data_2 = np.load(FLAGS.data_dir + 'test_x_2.npy')
+  test_data_3 = np.load(FLAGS.data_dir + 'test_x_3.npy')
+  test_data_4 = np.load(FLAGS.data_dir + 'test_x_4.npy')
+  test_data = [test_data_1, test_data_2, test_data_3, test_data_4]
   
-  valid_labels_1 = np.load(FLAGS.data_dir + 'test_y_1.npy')
-  valid_labels_2 = np.load(FLAGS.data_dir + 'test_y_2.npy')
-  valid_labels_3 = np.load(FLAGS.data_dir + 'test_y_3.npy')
-  valid_labels_4 = np.load(FLAGS.data_dir + 'test_y_4.npy')
-  valid_labels = [valid_labels_1, valid_labels_2, valid_labels_3, valid_labels_4]
+  test_labels_1 = np.load(FLAGS.data_dir + 'test_y_1.npy')
+  test_labels_2 = np.load(FLAGS.data_dir + 'test_y_2.npy')
+  test_labels_3 = np.load(FLAGS.data_dir + 'test_y_3.npy')
+  test_labels_4 = np.load(FLAGS.data_dir + 'test_y_4.npy')
+  test_labels = [test_labels_1, test_labels_2, test_labels_3, test_labels_4]
   
   train_data_1 = np.load(FLAGS.data_dir + 'train_x_1.npy')
   train_data_2 = np.load(FLAGS.data_dir + 'train_x_2.npy')
@@ -40,7 +40,7 @@ def main(argv):
   train_labels = [train_labels_1, train_labels_2, train_labels_3, train_labels_4]
   
   #count data
-  valid_count = [valid_data[0].shape[0], valid_data[1].shape[0], valid_data[2].shape[0], valid_data[3].shape[0]]
+  test_count = [test_data[0].shape[0], test_data[1].shape[0], test_data[2].shape[0], test_data[3].shape[0]]
   train_count = [train_data[0].shape[0], train_data[1].shape[0], train_data[2].shape[0], train_data[3].shape[0]]
 
   #specify model
@@ -70,9 +70,9 @@ def main(argv):
   #code adapted from Paul Quint's hackathon 3
   with tf.Session() as session:
     session.run(tf.global_variables_initializer())
-    best_valid_conf_mxs = []
+    best_test_conf_mxs = []
     best_epoch = [0, 0, 0, 0]
-    best_valid_ce = [10, 10, 10, 10]
+    best_test_ce = [10, 10, 10, 10]
     best_train_ce = [0, 0, 0, 0]
     best_classification_rate = [0, 0, 0, 0]
     epochs_since_best = [0, 0, 0, 0]
@@ -88,18 +88,18 @@ def main(argv):
         # run gradient steps and report mean loss on train data
         ce_vals = []
         conf_mxs = []
-        for i in range(valid_count[k] // batch_size):
-          batch_data = valid_data[k][i*batch_size:(i+1)*batch_size, :]
-          batch_labels = valid_labels[k][i*batch_size:(i+1)*batch_size]
-          valid_ce, conf_matrix = session.run([sum_cross_entropy, confusion_matrix_op], {input_placeholder: batch_data, labels: batch_labels})
-          ce_vals.append(valid_ce)
+        for i in range(test_count[k] // batch_size):
+          batch_data = test_data[k][i*batch_size:(i+1)*batch_size, :]
+          batch_labels = test_labels[k][i*batch_size:(i+1)*batch_size]
+          test_ce, conf_matrix = session.run([sum_cross_entropy, confusion_matrix_op], {input_placeholder: batch_data, labels: batch_labels})
+          ce_vals.append(test_ce)
           conf_mxs.append(conf_matrix)
-        avg_valid_ce = sum(ce_vals) / len(ce_vals)
-        print('VALID CROSS ENTROPY: ' + str(avg_valid_ce))
-        print('VALIDATION CONFUSION MATRIX:')
+        avg_test_ce = sum(ce_vals) / len(ce_vals)
+        print('test CROSS ENTROPY: ' + str(avg_test_ce))
+        print('testATION CONFUSION MATRIX:')
         print(str(sum(conf_mxs)))
         classification_rate = util.classification_rate(sum(conf_mxs),7)
-        print('VALIDATION CLASSIFICATION RATE:' + str(classification_rate))
+        print('testATION CLASSIFICATION RATE:' + str(classification_rate))
 
         ce_vals = []
         for i in range(train_count[k] // batch_size):
@@ -112,8 +112,8 @@ def main(argv):
 
         epochs_since_best[k] += 1
 
-        if(best_valid_ce[k] > avg_valid_ce): #tracking best
-          best_valid_ce[k] = avg_valid_ce
+        if(best_test_ce[k] > avg_test_ce): #tracking best
+          best_test_ce[k] = avg_test_ce
           best_train_ce[k] = avg_train_ce
           best_epoch[k] = epoch
           best_classification_rate[k] = classification_rate
@@ -122,15 +122,15 @@ def main(argv):
 
         if(epochs_since_best[k] >= EPOCHS_BEFORE_STOPPING): #early stopping
           print("EARLY STOP")
-          best_valid_conf_mxs.append(sum(conf_mxs))
+          best_test_conf_mxs.append(sum(conf_mxs))
           break
 
         print("\n##################################################")
 
     print('Confusion Matrix: ')
-    print(str(sum(best_valid_conf_mxs)))
+    print(str(sum(best_test_conf_mxs)))
     print('Avg Best Epoch: ' + str(np.average(best_epoch)))
-    print('Avg Valid CE: ' + str(np.average(best_valid_ce)))
+    print('Avg test CE: ' + str(np.average(best_test_ce)))
     print('Avg Train CE: ' + str(np.average(best_train_ce)))
     print('Avg Classification Rate: ' + str(np.average(best_classification_rate)))
     print('Generating model now...')
