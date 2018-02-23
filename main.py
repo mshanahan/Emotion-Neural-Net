@@ -96,21 +96,6 @@ def main(argv):
         best_train_ce[k] = avg_train_ce
         print('TRAIN CROSS ENTROPY: ' + str(avg_train_ce))
 
-#        epochs_since_best[k] += 1
-#
-#        if(best_test_ce[k] > avg_test_ce): #tracking best
-#          best_test_ce[k] = avg_test_ce
-#          best_train_ce[k] = avg_train_ce
-#          best_epoch[k] = epoch
-#          best_classification_rate[k] = classification_rate
-#          epochs_since_best[k] = 0
-#          print("BEST FOUND")
-#
-#        if(epochs_since_best[k] >= EPOCHS_BEFORE_STOPPING): #early stopping
-#          print("EARLY STOP")
-#          best_test_conf_mxs.append(sum(conf_mxs))
-#          break
-
         print("\n##################################################")
         
       # run gradient steps and report mean loss on train data
@@ -140,7 +125,6 @@ def main(argv):
     print('Avg Classification Rate: ' + str(np.average(best_classification_rate)))
     print('Generating model now...')
     session.run(tf.global_variables_initializer())
-#    epochs_to_train_for = math.ceil(np.average(best_epoch))
 
     for j in range(0,4):
       for epoch in range(FLAGS.max_epoch_num):
