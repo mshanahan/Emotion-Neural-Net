@@ -142,12 +142,12 @@ def main(argv):
     session.run(tf.global_variables_initializer())
 #    epochs_to_train_for = math.ceil(np.average(best_epoch))
 
-#    for j in range(0,4):
-#      for epoch in range(epochs_to_train_for):
-#        for i in range(train_count[j] // batch_size):
-#          batch_data = train_data[j][i*batch_size:(i+1)*batch_size, :]
-#          batch_labels = train_labels[j][i*batch_size:(i+1)*batch_size]
-#          _, train_ce = session.run([train_op, sum_cross_entropy], {input_placeholder: batch_data, labels: batch_labels})
+    for j in range(0,4):
+      for epoch in range(FLAGS.max_epoch_num):
+        for i in range(train_count[j] // batch_size):
+          batch_data = train_data[j][i*batch_size:(i+1)*batch_size, :]
+          batch_labels = train_labels[j][i*batch_size:(i+1)*batch_size]
+          _, train_ce = session.run([train_op, sum_cross_entropy], {input_placeholder: batch_data, labels: batch_labels})
 
     saver.save(session, FLAGS.save_dir)
     print('Model is generated and saved')
