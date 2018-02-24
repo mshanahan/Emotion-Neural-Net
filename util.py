@@ -1,4 +1,4 @@
-#author: Michael Shanahan 42839964
+#author: Michael Shanahan and Chulwoo Pack
 import tensorflow as tf
 import numpy as np
 
