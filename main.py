@@ -8,7 +8,7 @@ import math
 #code to set flags by Paul Quint
 flags = tf.app.flags
 flags.DEFINE_string('data_dir', '/work/cse496dl/shared/homework/02/EMODB-German/', 'directory where MNIST is located')
-flags.DEFINE_string('save_dir', '/work/cse496dl/mshanaha/homework_2/emodb_homework_2-0-0', 'directory where model graph and weights are saved')
+flags.DEFINE_string('save_dir', '/work/cse496dl/mshanaha/homework_2/emodb_homework_2-0', 'directory where model graph and weights are saved')
 flags.DEFINE_integer('batch_size', 32, '')
 flags.DEFINE_integer('max_epoch_num', 25, '')
 FLAGS = flags.FLAGS
@@ -45,7 +45,7 @@ def main(argv):
 
   #specify model
   input_placeholder = tf.placeholder(tf.float32, [None,16641], name='input_placeholder')
-  my_network = tf.identity(model.build_network(input_placeholder),name='output')
+  my_network = tf.identity(model.build_network(input_placeholder),name='output2')
 
   #define classification loss
   #code adapted from Paul Quint's hackathon 3
