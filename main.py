@@ -7,8 +7,8 @@ import math
 
 #code to set flags by Paul Quint
 flags = tf.app.flags
-flags.DEFINE_string('data_dir', '/work/cse496dl/shared/homework/02/EMODB-German/', 'directory where MNIST is located')
-flags.DEFINE_string('save_dir', '/work/cse496dl/mshanaha/homework_2/emodb_homework_2-0-0', 'directory where model graph and weights are saved')
+flags.DEFINE_string('data_dir', '/work/cse496dl/shared/homework/02/SAVEE-British/', 'directory where MNIST is located')
+flags.DEFINE_string('save_dir', '/work/cse496dl/mshanaha/homework_2/savee_homework_2-0', 'directory where model graph and weights are saved')
 flags.DEFINE_integer('batch_size', 32, '')
 flags.DEFINE_integer('max_epoch_num', 100, '')
 FLAGS = flags.FLAGS
@@ -44,23 +44,39 @@ def main(argv):
   train_count = [train_data[0].shape[0], train_data[1].shape[0], train_data[2].shape[0], train_data[3].shape[0]]
 
   #specify model
-  input_placeholder = tf.placeholder(tf.float32, [None,16641], name='input_placeholder')
-  my_network = tf.identity(model.build_network(input_placeholder),name='output')
+#  input_placeholder = tf.placeholder(tf.float32, [None,16641], name='input_placeholder')
+#  my_network = tf.identity(model.build_network(input_placeholder),name='output')
+
+  session = tf.Session()
+  saver = tf.train.import_meta_graph('emodb_homework_2-0.meta')
+  saver.restore(session, 'emodb_homework_2-0')
+  graph = session.graph
+  
+  input_placeholder = graph.get_tensor_by_name('input_placeholder:0')
+  conv_2 = graph.get_tensor_by_name('convolutional/pool_2:0')
+  flatten_stop_conv = tf.reshape(tf.stop_gradient(conv_2),[-1,33 * 33 * 32])
+  linear_layer = model.linear_layer(flatten_stop_conv)
+  my_network = tf.identity(linear_layer,name='output2')
 
   #define classification loss
   #code adapted from Paul Quint's hackathon 3
+  with tf.name_scope('optimizer') as scope:
+    optimizer = tf.train.AdamOptimizer()
+    train_op = optimizer.minimize(total_loss, global_step=global_step_tensor)
+    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=my_network)
   REG_COEFF = 0.0001
   labels = tf.placeholder(tf.float32, [None, 7], name='labels')
-  cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=my_network)
   confusion_matrix_op = tf.confusion_matrix(tf.argmax(labels, axis=1), tf.argmax(my_network, axis=1), num_classes=7)
   regularization_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
   total_loss = cross_entropy + REG_COEFF * sum(regularization_losses)
 
   #set up training and saving
-  #code adapted from Paul Quint's hackathon 3
+  #code adapted from Paul Quint's hackathon 3 and 5
+  
+  optimizer_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "optimizer")
+  dense_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "linear_transfer")
+
   global_step_tensor = tf.get_variable('global_step', trainable=False, shape=[], initializer=tf.zeros_initializer)
-  optimizer = tf.train.AdamOptimizer()
-  train_op = optimizer.minimize(total_loss, global_step=global_step_tensor)
   saver = tf.train.Saver()
   sum_cross_entropy = tf.reduce_mean(cross_entropy)
   
@@ -69,7 +85,7 @@ def main(argv):
   #run the actual training
   #code adapted from Paul Quint's hackathon 3
   with tf.Session() as session:
-    session.run(tf.global_variables_initializer())
+    session.run(tf.global_variables_initializer(optimizer_vars + dense_vars))
     best_valid_conf_mxs = []
     best_epoch = [0, 0, 0, 0]
     best_valid_ce = [10, 10, 10, 10]
@@ -78,7 +94,7 @@ def main(argv):
     epochs_since_best = [0, 0, 0, 0]
 
     for k in range(0,4):
-      session.run(tf.global_variables_initializer())
+      session.run(tf.global_variables_initializer(optimizer_vars + dense_vars))
       batch_size = FLAGS.batch_size
       print("\n !!!!! NEW K (" + str(k) + ") !!!!!\n")
       for epoch in range(FLAGS.max_epoch_num):
@@ -134,7 +150,7 @@ def main(argv):
     print('Avg Train CE: ' + str(np.average(best_train_ce)))
     print('Avg Classification Rate: ' + str(np.average(best_classification_rate)))
     print('Generating model now...')
-    session.run(tf.global_variables_initializer())
+    session.run(tf.global_variables_initializer(optimizer_vars + dense_vars))
     epochs_to_train_for = math.ceil(np.average(best_epoch))
 
     for j in range(0,4):

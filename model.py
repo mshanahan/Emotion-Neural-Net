@@ -69,14 +69,14 @@ def convolutional_layer(inputs):
 def linear_layer(inputs):
   layer_counts = [32, 32]
 
-  with tf.name_scope("linear"):
+  with tf.name_scope("linear_transfer"):
     hidden_1 = tf.layers.dense(
       inputs,
       layer_counts[0],
       activation = tf.nn.relu,
       bias_regularizer = regularizer,
       kernel_regularizer = regularizer,
-      name = 'hidden_1')
+      name = 'hidden_1_2')
 
     hidden_2 = tf.layers.dense(
       hidden_1,
@@ -84,6 +84,8 @@ def linear_layer(inputs):
       activation = tf.nn.relu,
       bias_regularizer = regularizer,
       kernel_regularizer = regularizer,
-      name = 'hidden_2')
+      name = 'hidden_2_2')
+      
+    output_layer = tf.layers.dense(hidden_2, 7, name = 'output_layer')
 
-  return hidden_2
+  return output_layer
