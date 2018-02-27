@@ -2,6 +2,13 @@ import tensorflow as tf
 import numpy as np
 import os
 
+def build_network(input_placeholder):
+    tf.reset_default_graph()
+    output_layer = conv_block(input_placeholder, [32,64,128], [3,3,3], tf.nn.relu, 0.2)
+    #logits = tf.identity(output_layer,name='output_hmm')
+    return output_layer
+
+
 def conv_block(inputs, filters, kernel_size, activation, dropout):
     with tf.name_scope('Input_reshaped') as scope:
         reshaped_inputs = tf.reshape(inputs, [-1, 129, 129, 1])
@@ -46,13 +53,7 @@ def conv_block(inputs, filters, kernel_size, activation, dropout):
                                 name='pool_3')
 
     # Logit layer
-    #flat = tf.reshape(pool2,[-1, 32*32*64])
     flat = tf.reshape(pool3,[-1, 16*16*128])
-    #flat = tf.layers.dense(flat,1024)
-    #flat = tf.layers.dense(flat, 32768, name='dense_1')
-    #flat = tf.layers.dense(flat, 30198, name='dense_1')
-    dropout = tf.layers.dropout(inputs=flat,
-                           rate=dropout, name='dropout')
-    output = tf.layers.dense(dropout, units=7, name='output')
-        
+    dropout = tf.layers.dropout(inputs=flat, rate=dropout, name='dropout')
+    output = tf.layers.dense(dropout, units=7, name='output_layer')
     return output
